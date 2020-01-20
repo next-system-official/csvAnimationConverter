@@ -8,6 +8,7 @@ using UnityEditor;
 // TODO : 最終的に使用しないのであれば削除
 public class MotionPlayer : MonoBehaviour
 {
+    private readonly string CLIP_NAME = "ImportClip";
     /// <summary>
     /// モーションを再生するオブジェクト．
     /// </summary>
@@ -21,10 +22,14 @@ public class MotionPlayer : MonoBehaviour
     private Animation _animation = null;
     [SerializeField]
     private TextAsset _csv = null;
-
+    private AnimationClip _clip = null;
     private void Awake()
     {
         _animation = _target.GetComponent<Animation>();
+        if (_animation == null)
+        {
+            _animation = _target.gameObject.AddComponent<Animation>();
+        }
     }
 
     private void Update()
@@ -37,17 +42,11 @@ public class MotionPlayer : MonoBehaviour
             {
                 return;
             }
-
-            var clip = _animation.GetClip($"ImportClip");
-            if (clip != null)
+            if (_animation?.GetClipCount() == null)
             {
-                _animation?.Play(clip.name);
-                _count++;
-                if (_count >= _animation.GetClipCount())
-                {
-                    _count = 0;
-                }
+                return;
             }
+            _animation?.Play(CLIP_NAME);
         }
         // アニメーションクリップ作成.
         else if (Input.GetKeyDown(KeyCode.L))
@@ -55,8 +54,8 @@ public class MotionPlayer : MonoBehaviour
             if (_csv != null)
             {
                 var clip = CSVMotionDataImporter.Import(_csv.text, _target);
-                _target.GetComponent<Animation>().AddClip(clip, $"ImportClip");
-
+                clip.legacy = true;
+                _animation?.AddClip(clip, CLIP_NAME);
 #if UNITY_EDITOR
                 Directory.CreateDirectory($"Assets/Animations/");
                 AssetDatabase.CreateAsset(clip, $"Assets/Animations/Clip.anim");

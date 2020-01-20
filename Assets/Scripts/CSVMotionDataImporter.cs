@@ -247,7 +247,7 @@ namespace sample_app.single.ios.Main
         private static AnimationClip CreateAnimationClip(Transform target, Dictionary<HumanBodyBones, AnimationCurve[]> dicBoneCurve)
         {
             var clip = new AnimationClip();
-            clip.legacy = true;
+            clip.legacy = false;
 
             var animator = target.GetComponent<Animator>();
 
